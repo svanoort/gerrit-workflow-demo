@@ -1,0 +1,4 @@
+# Base image with Gerrit
+FROM gerritforge/gerrit-ubuntu15.04
+
+# Add 
