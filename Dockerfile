@@ -8,13 +8,10 @@ RUN echo "deb mirror://mirrorlist.gerritforge.com/deb gerrit contrib" > /etc/apt
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1871F775
 
 # Allow remote connectivity and sudo
-RUN apt-get update
-RUN apt-key update
-RUN apt-get -y install openssh-client sudo
+RUN apt-get update && apt-key update && apt-get -y install openssh-client sudo openjdk-7-jdk
 
 # Install OpenJDK and Gerrit in two subsequent transactions
 # (pre-trans Gerrit script needs to have access to the Java command)
-RUN apt-get -y install openjdk-7-jdk
 RUN apt-get -y install gerrit=2.11.3-1
 
 USER gerrit
