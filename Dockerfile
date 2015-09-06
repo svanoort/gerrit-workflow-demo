@@ -48,11 +48,15 @@ VOLUME /var/jenkins_home
 # Allow incoming traffic, 8080 is gerrit, 29418 is gerrit ssh, 8081 is Jenkins
 EXPOSE 29418 8080 8081
 
-# Start Gerrit and Jenkins TODO add jenkins startup
-#CMD /var/gerrit/bin/gerrit.sh start && tail -f /var/gerrit/logs/error_log
-
-ENV COPY_REFERENCE_FILE_LOG $JENKINS_HOME/copy_reference_file.log
-
 USER jenkins
-# Run scripts
+ENV JENKINS_HOME /var/jenkins_home
 COPY jenkins.sh /usr/local/bin/jenkins.sh
+ENV COPY_REFERENCE_FILE_LOG $JENKINS_HOME/copy_reference_file.log
+ENV JENKINS_OPTS "--httpPort=8081"
+
+USER root
+# Starts both jeknins and gerritt under different users
+COPY run.sh /usr/local/bin/run.sh
+
+# Jenkins, gerritt startup
+CMD /usr/local/bin/run.sh
