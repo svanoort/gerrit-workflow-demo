@@ -1,17 +1,13 @@
-<!-- Dummy repo manifest, will not work yet! -->
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <remote  name="bitbucket"
-           fetch="https://bitbucket.org" />
+  <remote  name="local"
+           fetch="git://localhost/" />
 
-  <default revision="refs/heads/master"
-           remote="bitbucket"
+  <default revision="master"
+           remote="local"
            sync-j="4" />
 
-  <project name="miniat/0x1-miniat" remote="bitbucket" path="vm"/>
-  <project name="miniat/0x1-assembler" remote="bitbucket" path="assembler"/>
-  <project name="miniat/0x1-debugger" remote="bitbucket" path="debugger"/>
-  <project name="miniat/0x1-examples" remote="bitbucket" path="examples"/>
-  <project name="miniat/0x1-examples-asms-bins" remote="bitbucket" path="asms"/>
+  <project name="primary" remote="local" path="primary"/>
+  <project name="secondary" remote="local" path="secondary"/>
 
 </manifest>
