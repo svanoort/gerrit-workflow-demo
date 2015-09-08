@@ -17,15 +17,13 @@ RUN git config --global user.email "demouser@example.com" && \
 EXPOSE 9418
 USER gerrit
 
-# Create repo working copies
-RUN cd /tmp/repos-wc && \
+# Create repo working copies & then do bare clones to expose for work
+RUN cd /tmp/repos-wc && mkdir /tmp/repos && \
     for r in primary secondary umbrella; do ( \
         cd $r; git init && git add . && git commit -am "Initial commit"; \
+        git clone --bare /tmp/repos-wc/$r /tmp/repos/$r; \
     ); done;
 
-
 # Initialize the actual repos
-RUN mkdir /tmp/repos && cd /tmp/repos && \
-    for r in primary secondary umbrella; do git clone --bare /tmp/repos-wc/$r /tmp/repos/$r; done
 COPY run.sh /usr/local/bin/
 CMD /usr/local/bin/run.sh
