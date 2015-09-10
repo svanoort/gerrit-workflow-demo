@@ -6,7 +6,7 @@ MAINTAINER svanoort
 USER root
 ENV JENKINS_UC http://jenkins-updates.cloudbees.com
 
-# Keys for gerrit user, passphrase is "demouserpassword"
+# Keys for gerrit user, passphrase is EMPTY
 COPY demo_key_rsa /tmp/
 COPY workflow-version.txt /tmp/
 COPY plugins.txt /tmp/

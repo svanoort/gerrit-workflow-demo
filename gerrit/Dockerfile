@@ -4,18 +4,19 @@ MAINTAINER svanoort
 USER root
 RUN apt-get install -y curl python net-tools && \
     rm -rf /var/lib/apt/lists/*
-RUN curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo \
-    && chmod a+x ~/bin/repo
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo \
+    && chmod a+x /bin/repo
 
 COPY ReviewDB.h2.db /var/gerrit/db/ReviewDB.h2.db
 COPY repos /tmp/repos-wc
-RUN chown -R gerrit:gerrit /tmp/repos-wc /var/gerrit/db/ReviewDB.h2.db
-RUN git config --global user.email "demouser@example.com" && \
-    git config --global user.name "Demo User"
+RUN chown -R gerrit:gerrit /tmp/repos-wc var/gerrit/db/ReviewDB.h2.db
 
 # Git access to repo
 EXPOSE 9418
+
 USER gerrit
+RUN git config --global user.email "demouser@example.com" && \
+    git config --global user.name "Demo User"
 
 # This is how we save gerrit user/project configuration
 

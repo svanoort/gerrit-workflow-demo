@@ -33,7 +33,6 @@ In fitting with Docker best practices, this is split into two Docker containers:
 1. Verifying Gerrit access by SSH for jenkins
 * go to the gerrit-workflow-demo/jenkins
 * run the following: `ssh -i demo_key_rsa -p 29418 demouser@localhost`
-* passphrase is: "demouserpassword" (without quotes around it)
 * you should see the following:
 ```
 Enter passphrase for key 'demo_key_rsa': 
