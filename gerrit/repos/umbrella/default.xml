@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
   <remote  name="local"
-           fetch="git://localhost/" />
+           fetch="http://localhost:8080/" />
 
   <default revision="master"
            remote="local"
