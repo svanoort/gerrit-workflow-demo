@@ -26,9 +26,7 @@ RUN cd /tmp/repos-wc && mkdir /tmp/repos && \
         git clone --bare /tmp/repos-wc/$r /var/gerrit/git/$r.git; \
     ); done;
 
-# Initialize the actual repos
-COPY run.sh /usr/local/bin/
-CMD /usr/local/bin/run.sh
+CMD /var/gerrit/bin/gerrit.sh start && tail -f /var/gerrit/logs/error_log
 
 # Docker doesn't set this to user home by default
 ENV HOME /var/gerrit
