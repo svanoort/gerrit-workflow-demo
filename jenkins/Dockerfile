@@ -18,4 +18,9 @@ RUN sed -i "s/@VERSION@/`cat /tmp/workflow-version.txt`/g" /tmp/plugins.txt
 USER jenkins
 RUN /usr/local/bin/plugins.sh /tmp/plugins.txt
 CMD /usr/local/bin/jenkins.sh
+
+# COPY KEYS FOR USER TO JENKINS DIR
 EXPOSE 8080
+
+# Keys for gerrit user, passphrase is "demouserpassword"
+COPY demo_key* /tmp/

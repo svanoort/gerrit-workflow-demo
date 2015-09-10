@@ -17,13 +17,23 @@ RUN git config --global user.email "demouser@example.com" && \
 EXPOSE 9418
 USER gerrit
 
+# COPY KEYS FOR USER TO JENKINS DIR
+# Copy DB
+
+COPY ReviewDB.h2.db /var/gerrit/db/ReviewDB.h2.db
+
+# Copy over config file
+
 # Create repo working copies & then do bare clones to expose for work
 RUN cd /tmp/repos-wc && mkdir /tmp/repos && \
     for r in primary secondary umbrella; do ( \
         cd $r; git init && git add . && git commit -am "Initial commit"; \
-        git clone --bare /tmp/repos-wc/$r /tmp/repos/$r; \
+        git clone --bare /tmp/repos-wc/$r /var/gerrit/git/$r.git; \
     ); done;
 
 # Initialize the actual repos
 COPY run.sh /usr/local/bin/
 CMD /usr/local/bin/run.sh
+ENV HOME /var/gerrit  # Docker doesn't set this to user home by default
+
+# TODO checkme that gerrit handles this right!
