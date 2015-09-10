@@ -19,6 +19,15 @@ In fitting with Docker best practices, this is split into two Docker containers:
 * jenkins-gerrit-wfdemo-jenkins - the jenkins host, complete with its own worfklow directory (runs on port 8081)
 * jenkins-gerrit-wfdemo-gerrit - gerrit server on port 8080, with local git repos and repo running in server mode 
 
+# Local Setup
+1. Install repo
+2. Run ```repo init -u http://localhost:8080/umbrella && repo sync```
+3. Pick a repo: ```cd primary```
+4. Install commit-msg hook for gerrit to create chg id: ```curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg```
+5. Create commit content: ```echo sample stuff > file.txt```
+6. Commit (you must be a registered user with gerrit): ```git commit -c user.email=demouser@example.com -c user.name="Demo User" -am "Sample commit msg"```
+7. Push commit (use HTTP auth from user settings, or SSH id): ```git push local HEAD:refs/for/master```
+
 # Troubleshooting
 
 1. Verifying Gerrit access by SSH for jenkins
