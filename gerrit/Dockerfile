@@ -7,9 +7,9 @@ RUN apt-get install -y curl python net-tools && \
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo \
     && chmod a+x ~/bin/repo
 
-
+COPY ReviewDB.h2.db /var/gerrit/db/ReviewDB.h2.db
 COPY repos /tmp/repos-wc
-RUN chown -R gerrit:gerrit /tmp/repos-wc
+RUN chown -R gerrit:gerrit /tmp/repos-wc /var/gerrit/db/ReviewDB.h2.db
 RUN git config --global user.email "demouser@example.com" && \
     git config --global user.name "Demo User"
 
@@ -17,12 +17,7 @@ RUN git config --global user.email "demouser@example.com" && \
 EXPOSE 9418
 USER gerrit
 
-# COPY KEYS FOR USER TO JENKINS DIR
-# Copy DB
-
-COPY ReviewDB.h2.db /var/gerrit/db/ReviewDB.h2.db
-
-# Copy over config file
+# This is how we save gerrit user/project configuration
 
 # Create repo working copies & then do bare clones to expose for work
 RUN cd /tmp/repos-wc && mkdir /tmp/repos && \
@@ -34,6 +29,6 @@ RUN cd /tmp/repos-wc && mkdir /tmp/repos && \
 # Initialize the actual repos
 COPY run.sh /usr/local/bin/
 CMD /usr/local/bin/run.sh
-ENV HOME /var/gerrit  # Docker doesn't set this to user home by default
 
-# TODO checkme that gerrit handles this right!
+# Docker doesn't set this to user home by default
+ENV HOME /var/gerrit

@@ -18,3 +18,25 @@ In fitting with Docker best practices, this is split into two Docker containers:
 
 * jenkins-gerrit-wfdemo-jenkins - the jenkins host, complete with its own worfklow directory (runs on port 8081)
 * jenkins-gerrit-wfdemo-gerrit - gerrit server on port 8080, with local git repos and repo running in server mode 
+
+# Troubleshooting
+
+1. Verifying Gerrit access by SSH for jenkins
+* go to the gerrit-workflow-demo/jenkins
+* run the following: `ssh -i demo_key_rsa -p 29418 demouser@localhost`
+* passphrase is: "demouserpassword" (without quotes around it)
+* you should see the following:
+```
+Enter passphrase for key 'demo_key_rsa': 
+
+  ****    Welcome to Gerrit Code Review    ****
+
+  Hi demouser, you have successfully connected over SSH.
+
+  Unfortunately, interactive shells are disabled.
+  To clone a hosted Git repository, use:
+
+  git clone ssh://demouser@25680d00e8b3:29418/REPOSITORY_NAME.git
+
+Connection to localhost closed.
+```
