@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <remote  name="local"
+           fetch="http://gerrit:8080/" />
+
+  <default revision="master"
+           remote="local"
+           sync-j="4" />
+
+  <project name="primary" remote="local" path="primary"/>
+  <project name="secondary" remote="local" path="secondary"/>
+
+</manifest>

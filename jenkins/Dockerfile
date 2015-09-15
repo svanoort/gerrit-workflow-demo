@@ -6,6 +6,17 @@ MAINTAINER svanoort
 USER root
 ENV JENKINS_UC http://jenkins-updates.cloudbees.com
 
+# Google repo install
+RUN apt-get install -y curl python && \
+    rm -rf /var/lib/apt/lists/*
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo \
+    && chmod a+x /bin/repo
+
+# Maven install
+ENV MAVEN_VERSION 3.3.1
+RUN cd /usr/local; wget -O - http://mirrors.ibiblio.org/apache/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar xvzf -
+RUN ln -sv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven
+
 # Keys for gerrit user, passphrase is EMPTY
 COPY demo_key_rsa /tmp/
 COPY workflow-version.txt /tmp/

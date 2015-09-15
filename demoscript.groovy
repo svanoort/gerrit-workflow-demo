@@ -3,6 +3,12 @@ def mvn(args) {
     sh "${tool 'Maven 3.x'}/bin/mvn ${args}"
 }
 
+def fetch_repo() {
+    sh 'repo init -u http://gerrit:8080/umbrella -m jenkins.xml'
+    sh 'repo sync'
+    sh 'repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER'
+}
+
 // TODO artifact passing
 // TODO generate maven artifacts to do stuff with....
 // TOOD patchset use
@@ -12,10 +18,9 @@ def builds = [:]
 builds['devtesting'] =  {
   stage 'building'
   node {
-    echo 'running dev testing'
-    // Do build
+    fetch_repo()
+    mvn('-version')
   }
-
 
   def integrationtests = [:]
   integrationtests['test1'] = {
@@ -34,7 +39,9 @@ builds['devtesting'] =  {
 builds['stage'] = {
   stage 'building'
   node {
-    echo 'building for stage'
+    fetch_repo()
+    sh 'repo init -u http://gerrit:8080/umbrella && repo sync'
+    mvn('-version')
   }
 }
 
