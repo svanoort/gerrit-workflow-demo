@@ -19,3 +19,12 @@ userContent/
 updates/
 secrets/
 nodes/
+builds/
+jenkins/jenkins_home/init.groovy.d/
+.bashrc
+.*
+*.bak
+*.log
+*.key*
+jobs/*/last*
+jobs/*/nextBuildNumber
