@@ -1,6 +1,6 @@
 branch-api:0.2-beta-4
 durable-task:1.6
-gerrit-trigger:2.15.0
+gerrit-trigger:2.15.1
 git:2.3.5
 git-client:1.17.0
 git-server:1.6
