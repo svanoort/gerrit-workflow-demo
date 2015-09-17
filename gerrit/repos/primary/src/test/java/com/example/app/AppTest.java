@@ -1,38 +1,31 @@
 package com.example.app;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static org.junit.Assert.*;
 
 /**
- * Unit test for simple App.
+ * Basic unit tests for command generation
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
+public class AppTest {
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
+    @Test
+    public void testRandomStrings() throws Exception {
+        String chars = "ABCDEDF";
+        String output = App.randomString(chars, 10);
+        assertEquals(10, output.length());
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+        // Check output
+        HashSet<Character> validChars = new HashSet<Character>();
+        for (char v : chars.toCharArray()) {
+            validChars.add(v);
+        }
+
+        for (char v : output.toCharArray()) {
+            assertTrue(validChars.contains(new Character(v)));
+        }
     }
 }
