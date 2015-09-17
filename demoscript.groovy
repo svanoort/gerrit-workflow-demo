@@ -30,6 +30,8 @@ builds['devtesting'] =  {
   }
   integrationtests['test2'] = {
     node {
+      // Test command 1 runs with command 2
+     // java -jar primary/target/primary-1.0-SNAPSHOT.jar `java -jar secondary/target/secondary-1.0-SNAPSHOT.jar`
      echo 'doing test2 for env 1'
     }
   }
