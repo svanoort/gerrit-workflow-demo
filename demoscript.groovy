@@ -52,18 +52,9 @@ builds['workflowrun'] =  {
 }
 
 // PARALLEL BUILD STEP
-builds['freestylebuild'] = {
+builds['parallelbuild'] = {
   stage 'building'
-  node {
-    sh 'rm -rf source2 || true'
-    // Remove dir component in 1.11
-    dir ('source2') {
-      fetch_repo()
-      sleep 30
-      mvn("clean compile install -Dmaven.test.skip -f primary/pom.xml")
-      mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
-    }
-  }
+  build job: 'freestylebuild', parameters: [[$class: 'StringParameterValue', name: 'sample', value: 'val']]
 }
 
 parallel builds

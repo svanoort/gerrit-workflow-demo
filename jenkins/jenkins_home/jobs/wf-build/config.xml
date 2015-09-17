@@ -64,14 +64,9 @@ builds[&apos;workflowrun&apos;] =  {
 }
 
 // PARALLEL BUILD STEP
-builds[&apos;freestylebuild&apos;] = {
+builds[&apos;parallelbuild&apos;] = {
   stage &apos;building&apos;
-  node {
-    fetch_repo()
-    sleep 30
-    mvn(&quot;clean compile install -Dmaven.test.skip -f primary/pom.xml&quot;)
-    mvn(&quot;clean compile install -Dmaven.test.skip -f secondary/pom.xml&quot;)
-  }
+  build job: &apos;freestylebuild&apos;, parameters: [[$class: &apos;StringParameterValue&apos;, name: &apos;sample&apos;, value: &apos;val&apos;]]
 }
 
 parallel builds</script>
