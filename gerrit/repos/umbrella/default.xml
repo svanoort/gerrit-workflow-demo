@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
   <remote  name="local"
-           fetch="http://localhost:8080/" />
+           fetch="http://localhost:8080/"
+           review="http://localhost:8080/" />
 
   <default revision="master"
            remote="local"
@@ -9,5 +10,4 @@
 
   <project name="primary" remote="local" path="primary"/>
   <project name="secondary" remote="local" path="secondary"/>
-
 </manifest>
