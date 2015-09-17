@@ -4,13 +4,11 @@ def mvn(args) {
 }
 
 def fetch_repo() {
-    sh 'repo init -u http://gerrit:8080/umbrella -m jenkins.xml'
+    sh 'repo init -u http://gerrit:8080/umbrella -m jenkins.xml'  // --repo-url=http://gerrit:8080/static/repo.bundle
     sh 'repo sync'
-    sh "repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER"
+//    sh "repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER"
 }
 
-// TODO artifact passing
-// TODO generate maven artifacts to do stuff with....
 // TOOD patchset use
 // TODO supply branch name to script for easy customization
 
@@ -18,40 +16,53 @@ def builds = [:]
 builds['workflowrun'] =  {
   stage 'building'
   node {
-    fetch_repo()
-    mvn("clean compile install -Dmaven.test.skip -f primary/pom.xml")
-    mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
-    step([$class: 'ArtifactArchiver', artifacts: '**/target/*.jar', fingerprint: true])
+    sh 'rm -rf source || true'
+    // Remove dir component in 1.11
+    dir ('source') {
+      fetch_repo()
+      mvn("clean compile install -f primary/pom.xml")
+      mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
+      sh "mv */target/*.jar ."
+      stash includes: '*.jar', name: 'jars'
+    }
   }
 
   def slowtests = [:]
   slowtests['Fuctional Tests'] = {
     node {
+     unstash name:'jars'
      sleep 2
+
+     // Verify the jars can run successfully
+     sh 'java -jar primary*.jar -delay 1 --length 100'
+     sh 'java -jar secondary*.jar'
      // Fetch both artifacts
-     // Run both jar artifacts 
+     // Run both jar artifacts
      echo 'doing test1 for env 1'
     }
   }
   slowtests['Integration tests'] = {
     node {
       sleep 15
-      // Fetch both artifacts
-      // Test command 1 runs with command 2
-     // java -jar primary/target/primary-1.0-SNAPSHOT.jar `java -jar secondary/target/secondary-1.0-SNAPSHOT.jar`
+      unstash name:'jars'
+      sh 'java -jar primary*.jar `java -jar secondary*.jar`'
     }
   }
   parallel slowtests
 }
 
+// PARALLEL BUILD STEP
 builds['freestylebuild'] = {
   stage 'building'
   node {
-    fetch_repo()
-    sh 'repo init -u http://gerrit:8080/umbrella && repo sync'
-    sleep 30
-    mvn("clean compile install -Dmaven.test.skip -f primary/pom.xml")
-    mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
+    sh 'rm -rf source2 || true'
+    // Remove dir component in 1.11
+    dir ('source2') {
+      fetch_repo()
+      sleep 30
+      mvn("clean compile install -Dmaven.test.skip -f primary/pom.xml")
+      mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
+    }
   }
 }
 

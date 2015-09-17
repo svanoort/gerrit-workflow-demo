@@ -1,17 +1,29 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <scriptApproval plugin="script-security@1.15">
   <approvedScriptHashes>
+    <string>0339bcfb77983b13ca93bae881c949b5ab4de736</string>
+    <string>0998af21bfa7102aad7d724232db6799ecc5840d</string>
     <string>0e33380b753be8d8b7ba138174fa4c4dc24b23ae</string>
     <string>3a5fda04ef3117c55ef74bd32d3e472488fb1a0c</string>
     <string>3c39929bb1fe7614126b50679c7e71af3dda6199</string>
     <string>49ef6e678996b6c21b4ed8ab455a66fca9f4ec2a</string>
     <string>4e1fd090e3be3f5030abce84333cfba5b61c634f</string>
+    <string>57912fd41b5038118728780520dad6bdaa547a25</string>
     <string>5d3cfec5974391112864afc0a156463eb250ab1a</string>
+    <string>6aa78e4a97e308ad52289392c53d7aa65248ff65</string>
+    <string>6ed3f3aa7dc70fe5923a5ca1f7c31c02f820677c</string>
     <string>73f4972421ee7bed6149ccff196d9fdecb4315d2</string>
+    <string>9659fb9fa6824cd14f3157bc92b85b310b3d32eb</string>
     <string>9a9980570d34cca07a3a0b36e19b3a8d2f85ec94</string>
     <string>ab85a2b4b3a812fc1337f061e59df9e6a3685787</string>
     <string>b98e47d5e239a3eaa400344ff6bbfe730492b0db</string>
+    <string>ba1b1ceef8a7f7e344a7e43082b2ea504e1110d8</string>
+    <string>bd58d1501a391ca6477cc0f161c9c1a33aba354c</string>
     <string>bdb37f5b83157fa7ce6e183fc58f3fb8a4f2398c</string>
+    <string>c4531cbdf8643bb40b1cd10ba57b8c48d92f3775</string>
+    <string>c5df82d87c2b9ae56bd5c92646c501f02a221949</string>
+    <string>dcf482ae3506f1c440696c7195eb2b7addb1b5be</string>
+    <string>f36c1e7a5b378ab02580d459331f915106640c06</string>
   </approvedScriptHashes>
   <approvedSignatures/>
   <aclApprovedSignatures/>

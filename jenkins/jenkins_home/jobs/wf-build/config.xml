@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@1.10">
   <actions/>
-  <description></description>
+  <description>Main workflow build!</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@0.2-beta-4">
@@ -16,44 +16,61 @@ def mvn(args) {
 }
 
 def fetch_repo() {
-    sh &apos;repo init -u http://gerrit:8080/umbrella -m jenkins.xml&apos;
+    sh &apos;repo init -u http://gerrit:8080/umbrella -m jenkins.xml&apos;  // --repo-url=http://gerrit:8080/static/repo.bundle
     sh &apos;repo sync&apos;
-    sh &apos;repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER&apos;
+//    sh &quot;repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER&quot;
 }
 
-// TODO artifact passing
-// TODO generate maven artifacts to do stuff with....
 // TOOD patchset use
 // TODO supply branch name to script for easy customization
 
 def builds = [:]
-builds[&apos;devtesting&apos;] =  {
+builds[&apos;workflowrun&apos;] =  {
   stage &apos;building&apos;
   node {
-    fetch_repo()
-    mvn(&apos;-version&apos;)
+    sh &apos;rm -rf source || true&apos;
+    // Remove dir component in 1.11
+    dir (&apos;source&apos;) {
+      fetch_repo()
+      mvn(&quot;clean compile install -f primary/pom.xml&quot;)
+      mvn(&quot;clean compile install -Dmaven.test.skip -f secondary/pom.xml&quot;)
+      sh &quot;mv */target/*.jar .&quot;
+      stash includes: &apos;*.jar&apos;, name: &apos;jars&apos;
+    }
   }
 
-  def integrationtests = [:]
-  integrationtests[&apos;test1&apos;] = {
+  def slowtests = [:]
+  slowtests[&apos;Fuctional Tests&apos;] = {
     node {
+     unstash name:&apos;jars&apos;
+     sleep 2
+
+     // Verify the jars can run successfully
+     sh &apos;java -jar primary*.jar -delay 1 --length 100&apos;
+     sh &apos;java -jar secondary*.jar&apos;
+     // Fetch both artifacts
+     // Run both jar artifacts
      echo &apos;doing test1 for env 1&apos;
     }
   }
-  integrationtests[&apos;test2&apos;] = {
+  slowtests[&apos;Integration tests&apos;] = {
     node {
-     echo &apos;doing test2 for env 1&apos;
+      sleep 15
+      unstash name:&apos;jars&apos;
+      sh &apos;java -jar primary*.jar `java -jar secondary*.jar`&apos;
     }
   }
-  parallel integrationtests
+  parallel slowtests
 }
 
-builds[&apos;stage&apos;] = {
+// PARALLEL BUILD STEP
+builds[&apos;freestylebuild&apos;] = {
   stage &apos;building&apos;
   node {
     fetch_repo()
-    sh &apos;repo init -u http://gerrit:8080/umbrella &amp;&amp; repo sync&apos;
-    mvn(&apos;-version&apos;)
+    sleep 30
+    mvn(&quot;clean compile install -Dmaven.test.skip -f primary/pom.xml&quot;)
+    mvn(&quot;clean compile install -Dmaven.test.skip -f secondary/pom.xml&quot;)
   }
 }
 
@@ -67,16 +84,6 @@ parallel builds</script>
         <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
           <compareType>PLAIN</compareType>
           <pattern>primary</pattern>
-          <branches>
-            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-              <compareType>PLAIN</compareType>
-              <pattern></pattern>
-            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-          </branches>
-        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
-        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
-          <compareType>PLAIN</compareType>
-          <pattern>secondary</pattern>
           <branches>
             <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
               <compareType>PLAIN</compareType>
