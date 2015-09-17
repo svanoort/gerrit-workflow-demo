@@ -34,4 +34,7 @@ jenkins/jenkins_home/init.groovy.d/
 *.log
 *.key*
 jobs/*/last*
-jobs/*/nextBuildNumber
+nextBuildNumber
+lastStable
+lastSuccessful
+jobs/*/workspace/
