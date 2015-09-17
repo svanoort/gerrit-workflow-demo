@@ -6,7 +6,7 @@ def mvn(args) {
 def fetch_repo() {
     sh 'repo init -u http://gerrit:8080/umbrella -m jenkins.xml'
     sh 'repo sync'
-    sh 'repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER'
+    sh "repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER"
 }
 
 // TODO artifact passing
@@ -15,35 +15,43 @@ def fetch_repo() {
 // TODO supply branch name to script for easy customization
 
 def builds = [:]
-builds['devtesting'] =  {
+builds['workflowrun'] =  {
   stage 'building'
   node {
     fetch_repo()
-    mvn('-version')
+    mvn("clean compile install -Dmaven.test.skip -f primary/pom.xml")
+    mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
+    step([$class: 'ArtifactArchiver', artifacts: '**/target/*.jar', fingerprint: true])
   }
 
-  def integrationtests = [:]
-  integrationtests['test1'] = {
+  def slowtests = [:]
+  slowtests['Fuctional Tests'] = {
     node {
+     sleep 2
+     // Fetch both artifacts
+     // Run both jar artifacts 
      echo 'doing test1 for env 1'
     }
   }
-  integrationtests['test2'] = {
+  slowtests['Integration tests'] = {
     node {
+      sleep 15
+      // Fetch both artifacts
       // Test command 1 runs with command 2
      // java -jar primary/target/primary-1.0-SNAPSHOT.jar `java -jar secondary/target/secondary-1.0-SNAPSHOT.jar`
-     echo 'doing test2 for env 1'
     }
   }
-  parallel integrationtests
+  parallel slowtests
 }
 
-builds['stage'] = {
+builds['freestylebuild'] = {
   stage 'building'
   node {
     fetch_repo()
     sh 'repo init -u http://gerrit:8080/umbrella && repo sync'
-    mvn('-version')
+    sleep 30
+    mvn("clean compile install -Dmaven.test.skip -f primary/pom.xml")
+    mvn("clean compile install -Dmaven.test.skip -f secondary/pom.xml")
   }
 }
 
