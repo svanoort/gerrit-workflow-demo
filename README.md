@@ -23,7 +23,7 @@ In fitting with Docker best practices, this is split into two Docker containers:
 1. Install repo: ```sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo && sudo chmod a+x /bin/repo```
 2. Run ```repo init -u http://localhost:8080/umbrella && repo sync```
 3. Pick a repo: ```cd primary```
-4. Install commit-msg hook for gerrit to create chg id: ```curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg```
+4. Install commit-msg hook for gerrit to create chg id FOR EACH REPO: ```curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg```
 5. Create commit content: ```echo sample stuff > file.txt```
 6. Commit (you must be a registered user with gerrit): ```git commit -c user.email=demouser@example.com -c user.name="Demo User" -am "Sample commit msg"```
 7. Push commit (use HTTP auth from user settings, or SSH id): ```git push local HEAD:refs/for/master```
@@ -48,3 +48,32 @@ Enter passphrase for key 'demo_key_rsa':
 
 Connection to localhost closed.
 ```
+
+2. Set up a local gerrit user:
+```shell
+sh config-gerrit.sh
+```
+By default, this will use your git name & email, set the gerrit username as local username, and your HTTP gerrit password as 'goober' (and add your local SSH public RSA key).  You can always set this up manually and change it from the gerrit interface
+
+2. Verifying gerrit push ACLs for user.  Clone and edit a file: 
+```shell
+git clone http://localhost:8080/primary
+cd primary
+
+# Set up the gerrit changeId hook
+curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg
+
+# Create a test commit
+echo 'blahblahblah' > newfile.txt && git add newfile.txt
+git commit -a -m "Test"
+
+# Verify push by ssh
+git push ssh://$USER@localhost:29418/primary HEAD:refs/for/master
+
+# Verify ability to push by HTTP
+echo 'moreblah' > morenewfile.txt && git add morenewfile.txt
+git commit -a -m "Another test"
+git push origin HEAD:refs/for/master
+```
+
+3. Repo push access
