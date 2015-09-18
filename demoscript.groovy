@@ -16,8 +16,8 @@ def builds = [:]
 builds['workflowrun'] =  {
   stage 'building'
   node {
-    sh 'rm -rf source || true'
-    // Remove dir component in 1.11
+    sh 'rm -rf source'
+    // Remove dir component in 1.11, replaced with deletedir
     dir ('source') {
       fetch_repo()
       mvn("clean compile install -f primary/pom.xml")
@@ -28,17 +28,15 @@ builds['workflowrun'] =  {
   }
 
   def slowtests = [:]
-  slowtests['Fuctional Tests'] = {
+  slowtests['Functional Tests'] = {
     node {
+     // Fetch both artifacts
      unstash name:'jars'
      sleep 2
 
-     // Verify the jars can run successfully
+     // Verify both jars can run successfully
      sh 'java -jar primary*.jar -delay 1 --length 100'
      sh 'java -jar secondary*.jar'
-     // Fetch both artifacts
-     // Run both jar artifacts
-     echo 'doing test1 for env 1'
     }
   }
   slowtests['Integration tests'] = {
@@ -48,6 +46,7 @@ builds['workflowrun'] =  {
       sh 'java -jar primary*.jar `java -jar secondary*.jar`'
     }
   }
+  slowtests['failFast'] = true
   parallel slowtests
 }
 
@@ -57,4 +56,5 @@ builds['parallelbuild'] = {
   build job: 'freestylebuild', parameters: [[$class: 'StringParameterValue', name: 'sample', value: 'val']]
 }
 
+builds['failFast'] = true
 parallel builds

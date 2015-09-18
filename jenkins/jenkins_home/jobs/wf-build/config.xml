@@ -28,8 +28,8 @@ def builds = [:]
 builds[&apos;workflowrun&apos;] =  {
   stage &apos;building&apos;
   node {
-    sh &apos;rm -rf source || true&apos;
-    // Remove dir component in 1.11
+    sh &apos;rm -rf source&apos;
+    // Remove dir component in 1.11, replaced with deletedir
     dir (&apos;source&apos;) {
       fetch_repo()
       mvn(&quot;clean compile install -f primary/pom.xml&quot;)
@@ -40,17 +40,15 @@ builds[&apos;workflowrun&apos;] =  {
   }
 
   def slowtests = [:]
-  slowtests[&apos;Fuctional Tests&apos;] = {
+  slowtests[&apos;Functional Tests&apos;] = {
     node {
+     // Fetch both artifacts
      unstash name:&apos;jars&apos;
      sleep 2
 
-     // Verify the jars can run successfully
+     // Verify both jars can run successfully
      sh &apos;java -jar primary*.jar -delay 1 --length 100&apos;
      sh &apos;java -jar secondary*.jar&apos;
-     // Fetch both artifacts
-     // Run both jar artifacts
-     echo &apos;doing test1 for env 1&apos;
     }
   }
   slowtests[&apos;Integration tests&apos;] = {
@@ -60,6 +58,7 @@ builds[&apos;workflowrun&apos;] =  {
       sh &apos;java -jar primary*.jar `java -jar secondary*.jar`&apos;
     }
   }
+  slowtests[&apos;failFast&apos;] = true
   parallel slowtests
 }
 
@@ -69,6 +68,7 @@ builds[&apos;parallelbuild&apos;] = {
   build job: &apos;freestylebuild&apos;, parameters: [[$class: &apos;StringParameterValue&apos;, name: &apos;sample&apos;, value: &apos;val&apos;]]
 }
 
+builds[&apos;failFast&apos;] = true
 parallel builds</script>
     <sandbox>false</sandbox>
   </definition>
@@ -82,7 +82,17 @@ parallel builds</script>
           <branches>
             <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
               <compareType>PLAIN</compareType>
-              <pattern></pattern>
+              <pattern>*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>secondary</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>PLAIN</compareType>
+              <pattern>*</pattern>
             </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
           </branches>
         </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
@@ -118,5 +128,9 @@ parallel builds</script>
       <triggerConfigURL></triggerConfigURL>
       <triggerInformationAction/>
     </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+    <hudson.triggers.SCMTrigger>
+      <spec>H/5 * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
   </triggers>
 </flow-definition>
