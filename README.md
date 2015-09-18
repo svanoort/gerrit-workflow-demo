@@ -20,11 +20,7 @@ In fitting with Docker best practices, this is split into two Docker containers:
 * jenkins-gerrit-wfdemo-gerrit - gerrit server on port 8080, with local git repos and repo running in server mode 
 
 # Local Setup
-1. Install repo: 
-```shell 
-  sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo \
-  sudo chmod a+x /bin/repo
-```
+1. Install repo: ```sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo && sudo chmod a+x /bin/repo```
 2. Run ```repo init -u http://localhost:8080/umbrella && repo sync```
 3. Pick a repo: ```cd primary```
 4. Install commit-msg hook for gerrit to create chg id: ```curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg```
