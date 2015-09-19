@@ -12,5 +12,5 @@ jenkins:
     - gerrit
   ports:
     - "8081:8080"
-  volumes: 
-    - ./jenkins/jenkins_home:/var/jenkins_home
+#  volumes: 
+#    - ./jenkins/jenkins_home:/var/jenkins_home

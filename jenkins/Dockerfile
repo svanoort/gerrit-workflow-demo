@@ -25,9 +25,8 @@ RUN sed -i "s/@VERSION@/`cat /tmp/workflow-version.txt`/g" /tmp/plugins.txt
 RUN chown jenkins:jenkins /tmp/demo_key_rsa
 
 # Set up jenkins home folder for starting point
-#ADD JENKINS_HOME /usr/share/jenkins/ref
-#RUN chown -R jenkins.jenkins /tmp/files
-# TODO do I need a workdir with /tmp/files?
+ADD jenkins_home /usr/share/jenkins/ref
+RUN chown -R jenkins.jenkins /usr/share/jenkins/ref
 
 USER jenkins
 RUN /usr/local/bin/plugins.sh /tmp/plugins.txt
