@@ -13,7 +13,7 @@ scm-api:0.2
 script-security:1.15
 subversion:2.5
 workflow-aggregator:@VERSION@
-workflow-api:@VERSION
+workflow-api:@VERSION@
 workflow-basic-steps:@VERSION@
 workflow-cps:@VERSION@
 workflow-cps-global-lib:@VERSION@
