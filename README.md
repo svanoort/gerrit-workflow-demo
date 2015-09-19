@@ -77,3 +77,12 @@ git push origin HEAD:refs/for/master
 ```
 
 3. Repo push access
+
+```shell
+repo init -u http://localhost:8080/umbrella && repo sync
+
+# Start a branch
+repo start feature-testing --all
+# Make and commit changes
+repo upload
+```
