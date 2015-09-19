@@ -1,10 +1,17 @@
 # gerrit-workflow-demo
 Demo of dockerized gerrit/jenkins workflow functionality
 
-To run me, pull or build both images:
+# To run:
 
-To build: run build.sh (using sudo if needed) - it will need a couple minutes to start up!
-To run: either pull or build images, then run start.sh
+* Using Docker Compose:  simply run 'docker compose up'
+* Vanilla Docker: 
+	- To build: run build.sh (using sudo if needed) - it will need a couple minutes
+	- To run: run start.sh
+
+# To stop:
+
+* Using Docker Compose: 'docker compose kill'
+* Vanilla Docker:  'docker rm -f gerrit && docker rm -f jenkins'
 
 This demonstrates a fairly complex real-world use case, where workflow builds may be run for 
 

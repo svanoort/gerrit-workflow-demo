@@ -1,0 +1,16 @@
+gerrit:
+  container_name: gerrit
+  build: ./gerrit
+  ports: 
+    - "8080:8080"
+    - "29418:29418"
+
+jenkins:
+  container_name: jenkins
+  build: ./jenkins
+  links: 
+    - gerrit
+  ports:
+    - "8081:8080"
+  volumes: 
+    - ./jenkins/jenkins_home:/var/jenkins_home
