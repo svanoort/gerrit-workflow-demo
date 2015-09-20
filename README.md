@@ -3,6 +3,9 @@ Demo of Dockerized gerrit/jenkins workflow functionality
 
 # Setup
 * Prerequisite: Linux or Mac with a working Docker installation (Boot2Docker or Docker machine will work), and *optionally* Docker Compose
+* Prerequisite for use of repo tool: installation
+  - Linux: `sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo && sudo chmod a+x /bin/repo`
+  - Mac: `curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo && chmod a+x ~/bin/repo`
 * Create Host Mappings (optional for linux, **required on Mac for Docker Machine / Boot2Docker** ):
   - Find your Docker host's IP and write it down
     - In linux on native docker, use 127.0.0.1
@@ -23,6 +26,10 @@ Demo of Dockerized gerrit/jenkins workflow functionality
 	- To build: run build.sh (using sudo if needed) - it will need a couple minutes
 	- To run: run start.sh
 
+# Using it:
+* Jenkins is available at localhost:8081 (Linux) or jenkins:8081 (Mac or with hosts entry)
+* Gerrit is available at localhost:80801 (Linux) or gerrit:8080 (Mac or with hosts entry) 
+
 # To stop:
 
 * Using Docker Compose: 'docker compose kill'
@@ -41,9 +48,9 @@ In fitting with Docker best practices, this is split into two Docker containers:
 * jenkins-gerrit-wfdemo-jenkins - the jenkins host, complete with its own worfklow directory (runs on port 8081)
 * jenkins-gerrit-wfdemo-gerrit - gerrit server on port 8080, with local git repos and repo running in server mode 
 
-# Local Setup
-1. Install repo: ```sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo && sudo chmod a+x /bin/repo```
-2. Run ```repo init -u http://localhost:8080/umbrella && repo sync```
+# REPO STUFF
+2. Run `repo init -u http://localhost:8080/umbrella && repo sync`  
+  - **ON MAC** `repo init -u http://gerrit:8080/umbrella -m jenkins.xml && repo sync`
 3. Pick a repo: ```cd primary```
 4. Install commit-msg hook for gerrit to create chg id FOR EACH REPO: ```curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg```
 5. Create commit content: ```echo sample stuff > file.txt```
