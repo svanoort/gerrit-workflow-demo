@@ -1,5 +1,20 @@
 # gerrit-workflow-demo
-Demo of dockerized gerrit/jenkins workflow functionality
+Demo of Dockerized gerrit/jenkins workflow functionality
+
+# Setup
+* Prerequisite: Linux or Mac with a working Docker installation (Boot2Docker or Docker machine will work), and *optionally* Docker Compose
+* Create Host Mappings (optional for linux, **required on Mac for Docker Machine / Boot2Docker** ):
+  - Find your Docker host's IP and write it down
+    - In linux on native docker, use 127.0.0.1
+    - For boot2docker, run `boot2docker ip`
+    - For Docker Machine, run `docker-machine ls` and finding the matching host
+  - In your favorite text editor (in sudo mode) open /etc/hosts for editing, ex `sudo vi /etc/hosts`
+  - Add two new lines mapping this IP to hostname 'jenkins' and 'gerrit' and save the file, ex:
+
+```
+192.168.99.100     gerrit
+192.168.99.100     jenkins
+```
 
 # To run:
 

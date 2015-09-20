@@ -1,5 +1,6 @@
 gerrit:
   container_name: gerrit
+  hostname: gerrit
   build: ./gerrit
   ports: 
     - "8080:8080"
@@ -8,6 +9,7 @@ gerrit:
 jenkins:
   container_name: jenkins
   build: ./jenkins
+  hostname: jenkins
   links: 
     - gerrit
   ports:
