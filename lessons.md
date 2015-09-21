@@ -2,7 +2,7 @@
 
 Some of these are docker-specific, some of these are tool specific
 
-* The JDK image layer is fat (nearly 500 MB!), plan accordingly! (skinnier images exist)
+* The JDK image layer is fat (nearly 500 MB!), plan accordingly! (skinnier images exist: https://github.com/errordeveloper/dockerfile-oracle-java/blob/master/jdk/Dockerfile)
 * Docker is not a magic bullet for integration problems between systems, in fact it makes it harder because you need to worry about linking containers & exposing ports
     - Both linked containers and other hosts need to have visibility and recognize hostnames
 * Know where and how your configs are stored; a lot of Java applications use XML and this is wonderful for building up Docker configs, because it's friendly to committing in git
