@@ -44,5 +44,8 @@ This is somewhat Docker-specific:
 ## Problem: How do I preload git repos into my gerrit container?   It has its own git stores under $GERRIT_BASE/git/
 * Solution: you can simply do `git clone --bare` for your repos while gerrit isn't running, when gerrit starts it'll pick them up
 
-## Problem: Jenkins needsa consistent hostname for the gerrit container to speak to it
+## Problem: Jenkins needs consistent hostname for the gerrit container to speak to it
 * Solution: Explicitly set names for containers
+
+## Problem: repo init will fail if Jenkins Home is mounted as a Docker volume
+* Solution: don't mount it as a volume, repo installs hooks using symlinks in a way that is not compatible with Docker volumes

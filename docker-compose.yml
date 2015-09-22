@@ -14,5 +14,7 @@ jenkins:
     - gerrit
   ports:
     - "8081:8080"
-  volumes: 
-    - ./jenkins/jenkins_home:/var/jenkins_home
+# Use caution when mountaining the home directory as a volume
+# Repo will fail to init, and performance issues may occur
+#  volumes: 
+#    - ./jenkins/jenkins_home:/var/jenkins_home
