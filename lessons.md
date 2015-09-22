@@ -1,32 +1,48 @@
-# Lessons:
-
-Some of these are docker-specific, some of these are tool specific
-
-* The JDK image layer is fat (nearly 500 MB!), plan accordingly! (skinnier images exist: https://github.com/errordeveloper/dockerfile-oracle-java/blob/master/jdk/Dockerfile)
-* Docker is not a magic bullet for integration problems between systems, in fact it makes it harder because you need to worry about linking containers & exposing ports
-    - Both linked containers and other hosts need to have visibility and recognize hostnames
-* Know where and how your configs are stored; a lot of Java applications use XML and this is wonderful for building up Docker configs, because it's friendly to committing in git
-    - While building your dockerfile, you can mount a local folder to the config directory
-    - Use ADD/COPY in the dockerfile to add this content
-    - Once you're done playing with configs, you can stop using volumes
-    - If you only want to use single files (example: the H2 DB file in Gerrit) it is very easy to "docker cp" to snag a known, good state
-    - Binaries are a problem. 
-* Java plays very nicely with Docker, though it does come with a memory footprint
-
-Iterative Development:
-
-* Building up your Dockerized config in a git repo is wonderful, because it lets you jump back and forth between different builds
-* Docker builds are repeatable, and Docker images 
-
 # Specific Technical Issues
-* Gerrit specific: code-review label verified breaks gerrit trigger:
-*  http://stackoverflow.com/questions/20019195/cant-find-label-verified-permission-in-gerrit-2-7
-*  Can either add verified label or set just to submit code review by changing gerrit trigger config
 
-* Repo/Gerrit Permissions Issues on Upload:
-    - http://stackoverflow.com/questions/11804469/debugging-repo-upload-problems-permission-denied-publickey
-    - Repo does something dumb in finding the username for SSH, fixed by explicitly setting a git config value in config-gerrit.sh
+## Problem: repo behaves eratically if the old .repo folder is not removed
+* Solution: rm and recreate the folder every time (using sh rm and the workflow dir step, or shell)
 
-# Repo use:
-Reset: 
-repo sync -d primary secondary
+## Problem: repo needs a git user configured to init a repo
+* Solution: configure a local git user for jenkins user, in the Dockerfile
+
+## Problem: SSH keyfile RSA encryption (default now) was not supported by a library gerrit trigger used, so use of a passphrase would make it impossible to use a key to speak to gerrit
+* Solution: Fixed with patch, released in gerrit trigger 2.15.1
+
+## Problem: gerrit needs to have a user configured for jenkins & baked into the image in order for the jenkins gerrit trigger to work
+* Solution: create the user in a Gerrit container and copy in the DB into your container
+  - This is conveniently set up in: util/copy_docker_db.sh - see gerrit/Dockerfile for the COPY
+
+## Problem: Jenkins Gerrit Trigger Needs a User With Stream Event Permissions, which are not on by default
+This is somewhat Docker-specific:
+* For an unDockerized Gerrit config, you'd simply create a new group "Streaming Events Users", add the jenkins user to it, and add give that group permission for streaming events in Projects > All Projects > Access within Gerrit UI
+* For Dockerized configs, the "All Projects" access configuration is in a git repo in gerrit, and landing the configuration for this repo within your gerrit container is a problem
+
+* Solution: Add the jenkins user to group "Non-Interactive Users" which has the Stream Events permission by default
+
+## Problem: Modern Versions of Gerrit do not include the 'verified' review label, which the Gerrit Trigger uses for voting by default
+
+* Solution 1: add the label to projects http://stackoverflow.com/questions/20019195/cant-find-label-verified-permission-in-gerrit-2-7
+* Solution 2: remove the verified label from gerrit trigger response in jenkins
+  - Manage Jenkins > Gerrit Trigger > edit next to server name > Advanced button at bottom 
+  - Under "Gerrit Verified Commands" remove the "--verified <VERIFIED>" section from each and it won't send this (just normal code review vote)
+
+## Problem: By default repo sets the SSH user name used to upload to gerrit using committer email and not username
+* Solution: Explicitly Set the Reviewer username for the review URL
+  - 'git config --global review.http://reviewhost:8080/.username $USER'
+  - http://stackoverflow.com/questions/11804469/debugging-repo-upload-problems-permission-denied-publickey
+  - See: config-gerrit.sh
+
+## Problem: Gerrit Trigger will send a SEVERE warning on Jenkins Startup that it cannot identify Gerrit version
+* Solution: safe to ignore, it still works, but see JENKINS-18391
+
+## Problem: On Init, repo will try to fetch content from googlesource if this fails it will not work
+* Solution: ensure you have external connectivity to https://gerrit.googlesource.com/git-repo/clone.bundle 
+* Possible other solution: use the --repo-url argument to point it at a local repo, and clone from there
+  - See: http://stackoverflow.com/questions/18895382/how-to-repo-init-on-a-disconnected-system
+
+## Problem: How do I preload git repos into my gerrit container?   It has its own git stores under $GERRIT_BASE/git/
+* Solution: you can simply do `git clone --bare` for your repos while gerrit isn't running, when gerrit starts it'll pick them up
+
+## Problem: Jenkins needsa consistent hostname for the gerrit container to speak to it
+* Solution: Explicitly set names for containers
