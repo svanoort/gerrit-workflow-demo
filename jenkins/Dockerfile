@@ -32,5 +32,9 @@ USER jenkins
 RUN /usr/local/bin/plugins.sh /tmp/plugins.txt
 CMD /usr/local/bin/jenkins.sh
 
+# Fix for issues with the 'repo' tool needing an ident
+RUN git config --global user.email "demouser@example.com" && \
+    git config --global user.name "Demo User"
+
 # COPY KEYS FOR USER TO JENKINS DIR
 EXPOSE 8080

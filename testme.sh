@@ -4,4 +4,5 @@ sudo docker run  -h gerrit -i -t --rm=true --name gerrit -p 8080:8080 -p 29418:2
 
 # Note when you run jenkins this way, something in the volumes means you have to run /usr/local/bin/jenkins.sh 
 # Twice (killing java in between)
+# NOTE: using Jenkins home in a volume will interact poorly with gerrit
 sudo docker run  -h jenkins -i -t --rm=true -v `pwd`/jenkins/jenkins_home:/var/jenkins_home -p 8081:8080 --name jenkins --link gerrit:gerrit jenkins-gerrit-wfdemo-jenkins:1.0 /bin/bash

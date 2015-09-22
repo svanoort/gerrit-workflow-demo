@@ -4,10 +4,18 @@ def mvn(args) {
 }
 
 def fetch_repo() {
-    sh 'repo init -u http://gerrit:8080/umbrella -m jenkins.xml' 
-    sh 'repo sync'
-    sh "repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER"
+//   def changeBranch = "change-${GERRIT_CHANGE_NUMBER}-${GERRIT_PATCHSET_NUMBER}"
+//   sh 'git clone http://gerrit:8080/primary'
+//   sh 'git clone http://gerrit:8080/secondary'
+   sh 'repo init stuff'
+   sh "cd $GERRIT_PROJECT"
+   sh "git checkout git fetch origin ${GERRIT_REFSPEC}:${changeBranch}"
+   sh "git checkout ${changeBranch}"
+   sh "cd .."
 }
+
+// TOOD patchset use
+// TODO supply branch name to script for easy customization
 
 def builds = [:]
 builds['workflowrun'] =  {
@@ -38,7 +46,7 @@ builds['workflowrun'] =  {
   }
   slowtests['Integration tests'] = {
     node {
-      sleep 15
+      sleep 30
       unstash name:'jars'
       sh 'java -jar primary*.jar `java -jar secondary*.jar`'
     }
@@ -50,7 +58,7 @@ builds['workflowrun'] =  {
 // PARALLEL BUILD STEP
 builds['parallelbuild'] = {
   stage 'building'
-  build job: 'freestylebuild', parameters: [[$class: 'StringParameterValue', name: 'sample', value: 'val']]
+  build job: 'freestylebuild-sample', parameters: [[$class: 'StringParameterValue', name: 'sample', value: 'val']]
 }
 
 builds['failFast'] = true

@@ -38,4 +38,5 @@ nextBuildNumber
 lastStable
 lastSuccessful
 workspace/
+workspace*/
 queue.xml
