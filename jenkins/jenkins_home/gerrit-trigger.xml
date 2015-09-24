@@ -60,7 +60,7 @@
         </watchTimeExceptionData>
         <notificationLevel>ALL</notificationLevel>
         <buildCurrentPatchesOnly>
-          <enabled>false</enabled>
+          <enabled>true</enabled>
           <abortNewPatchsets>false</abortNewPatchsets>
           <abortManualPatchsets>false</abortManualPatchsets>
         </buildCurrentPatchesOnly>
