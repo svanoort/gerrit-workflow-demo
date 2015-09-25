@@ -2,7 +2,7 @@
 Demo of Dockerized gerrit/jenkins workflow functionality
 
 # What?
-* Dockerized demonstration of an integrated Jenkins/Gerrit environment, using Jenkins workflow to construct a build/test pipeline
+* Dockerized demonstration of an integrated Jenkins/Gerrit environment, using Jenkins workflow to construct a build/test pipeline that is triggered when patchsets are submitted for review
 * Mimics the work environment of a real world user doing mobile development
 
 # Why?
@@ -12,7 +12,7 @@ Demo of Dockerized gerrit/jenkins workflow functionality
 
 This comprises 3 parts:
 * Jenkins server using workflow and the gerrit trigger plugin to work with gerrit patchsets
-* Gerrit server for code review
+* Gerrit server: acts as a central git repository and provides code review
 * Installation of git-repo tool (in both Jenkins and Gerrit), to support projects spanning multiple repositories
 * Code repos in gerrit for repo (umbrella manifest) and two sample Java projects
 
@@ -49,7 +49,48 @@ In fitting with Docker best practices, this is split into two Docker containers:
 
 # Using it:
 * Jenkins is available at localhost:8081 (Linux) or jenkins:8081 (Mac or with hosts entry)
-* Gerrit is available at localhost:80801 (Linux) or gerrit:8080 (Mac or with hosts entry) 
+* Gerrit is available at localhost:8080 (Linux) or gerrit:8080 (Mac or with hosts entry) 
+* To set up the local user with push permissions for gerrit:
+  -  **Linux:** `sh config-gerrit.sh`
+  -  **Mac or with hosts entry:** `sh config-gerrit-mac.sh`
+
+By default, this will use your git name & email, set the gerrit username as local username, and your HTTP gerrit password as 'goober' (and add your local SSH public RSA key).  You can always set this up manually and change it from the gerrit interface.
+
+# Sample project
+* By default, there are three repositories, each with a gerrit project
+  - 'umbrella' - this contains a manifest for repo
+  - 'primary' - Java command line tool to generate random text, after a delay.  Mimics an API provider, built with maven.  
+  - 'secondary' - Very basic java program to generate arguments to the program in 'primary.'  Mimics an API consumer, also built in maven
+
+# Creating commits and pushing to gerrit directly
+1. You must have a gerrit user configured (see "using it")
+2. Git clone repositories (replace 'gerrit' with localhost if using native Docker)
+  - http://gerrit:8080/primary  
+  - http://gerrit:8080/secondary
+3. Go into each repository and do the following to install Gerrit hooks: 
+  - *Linux*: `curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg`
+  - *Mac*: `curl -Lo .git/hooks/commit-msg http://gerrit:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg`
+4. Create a test commit
+  - `echo 'blahblahblah' > newfile.txt && git add newfile.txt`
+  - `git commit -a -m "Test"`
+5. Push by SSH
+  - *Linux:* `git push ssh://$USER@localhost:29418/primary HEAD:refs/for/master`
+  - *Mac:* `git push ssh://$USER@gerrit:29418/primary HEAD:refs/for/master`
+6. You should see new changes for review in Gerrit... and responses back from Jenkins after running 'wf-build'
+
+
+# Creating and uploading changes by repo
+1. You must have a gerrit user configured (see "using it") and repo installed
+2. Pull down the project structure via repo (must be installed, see prerequisites)
+  - *Linux, native docker:* `repo init -u http://localhost:8080/umbrella && repo sync`
+  - *Mac or linux with hosts entry*: `repo init -u http://gerrit:8080/umbrella -m jenkins.xml && repo sync`
+3. Start a new working branch in repo
+  - `repo start feature-testing --all`
+4. Push back changes for review: 
+  - `repo upload`
+5. You should see changes ready for review, and Jenkins test results from 'wf-build'
+6. Feel free to go back to the master branch:
+  - `repo sync -d`
 
 # To stop:
 * Using Docker Compose: 'docker-compose kill && docker-compose rm'
@@ -77,41 +118,3 @@ Enter passphrase for key 'demo_key_rsa':
 
 Connection to localhost closed.
 ```
-
-2. Set up a local gerrit user:
-  -  **Linux:** `sh config-gerrit.sh`
-  -  **Mac or with hosts entry:** `sh config-gerrit-mac.sh`
-
-By default, this will use your git name & email, set the gerrit username as local username, and your HTTP gerrit password as 'goober' (and add your local SSH public RSA key).  You can always set this up manually and change it from the gerrit interface.
-
-2. Verifying gerrit push ACLs for user.  Clone and edit a file: 
-```shell
-git clone http://localhost:8080/primary  # On Mac, use 'gerrit instead of localhost'
-cd primary
-
-# Set up the gerrit changeId hook
-curl -Lo .git/hooks/commit-msg http://localhost:8080/tools/hooks/commit-msg && chmod u+x .git/hooks/commit-msg
-
-# Create a test commit
-echo 'blahblahblah' > newfile.txt && git add newfile.txt
-git commit -a -m "Test"
-
-# Verify push by ssh
-git push ssh://$USER@localhost:29418/primary HEAD:refs/for/master
-
-# Verify ability to push by HTTP
-echo 'moreblah' > morenewfile.txt && git add morenewfile.txt
-git commit -a -m "Another test"
-git push origin HEAD:refs/for/master
-```
-
-3. Repo push access
-  1. Pull down the project structure via repo (must be installed, see prerequisites)
-    - *Linux, native docker:* `repo init -u http://localhost:8080/umbrella && repo sync`
-    - *Mac or linux with hosts entry*: `repo init -u http://gerrit:8080/umbrella -m jenkins.xml && repo sync`
-  2. Start a new working branch in repo
-    - `repo start feature-testing --all`
-  3. Push back changes for review: 
-    - `repo upload`
-  4. Go back to the master branch 
-    - `repo sync -d`
