@@ -29,7 +29,6 @@ def fetch_repo() {
 
 def builds = [:]
 builds[&apos;workflowrun&apos;] =  {
-  stage &apos;building&apos;
   node {
     sh &apos;rm -rf source&apos;
     // Remove dir component in 1.11, replaced with deletedir
@@ -67,7 +66,6 @@ builds[&apos;workflowrun&apos;] =  {
 
 // PARALLEL BUILD STEP
 builds[&apos;parallelbuild&apos;] = {
-  stage &apos;building&apos;
   build job: &apos;freestylebuild&apos;, parameters: [[$class: &apos;StringParameterValue&apos;, name: &apos;sample&apos;, value: &apos;val&apos;]]
 }
 
