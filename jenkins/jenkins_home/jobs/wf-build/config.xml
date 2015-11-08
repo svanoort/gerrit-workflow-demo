@@ -15,63 +15,24 @@
       <count>0</count>
     </jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@1.10">
-    <script>// Run this with mvn args on each node
-def mvn(args) {
-    sh &quot;${tool &apos;Maven 3.x&apos;}/bin/mvn ${args}&quot;
-}
-
-def fetch_repo() {
-    sh &apos;repo init -u http://gerrit:8080/umbrella -m jenkins.xml&apos; 
-    sh &apos;repo sync&apos;
-    sh &quot;repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER&quot;
-}
-
-def builds = [:]
-builds[&apos;workflowrun&apos;] =  {
-  node {
-    sh &apos;rm -rf source&apos;
-    // Remove dir component in 1.11, replaced with deletedir
-    dir (&apos;source&apos;) {
-      fetch_repo()
-      mvn(&quot;clean compile install -f primary/pom.xml&quot;)
-      mvn(&quot;clean compile install -Dmaven.test.skip -f secondary/pom.xml&quot;)
-      sh &quot;mv */target/*.jar .&quot;
-      stash includes: &apos;*.jar&apos;, name: &apos;jars&apos;
-    }
-  }
-
-  def slowtests = [:]
-  slowtests[&apos;Functional Tests&apos;] = {
-    node {
-     // Fetch both artifacts
-     unstash name:&apos;jars&apos;
-     sleep 2
-
-     // Verify both jars can run successfully
-     sh &apos;java -jar primary*.jar -delay 1 --length 100&apos;
-     sh &apos;java -jar secondary*.jar&apos;
-    }
-  }
-  slowtests[&apos;Integration tests&apos;] = {
-    node {
-      sleep 15
-      unstash name:&apos;jars&apos;
-      sh &apos;java -jar primary*.jar `java -jar secondary*.jar`&apos;
-    }
-  }
-  slowtests[&apos;failFast&apos;] = true
-  parallel slowtests
-}
-
-// PARALLEL BUILD STEP
-builds[&apos;parallelbuild&apos;] = {
-  build job: &apos;freestylebuild&apos;, parameters: [[$class: &apos;StringParameterValue&apos;, name: &apos;sample&apos;, value: &apos;val&apos;]]
-}
-
-builds[&apos;failFast&apos;] = true
-parallel builds</script>
-    <sandbox>false</sandbox>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@1.10">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>http://gerrit:8080/workflow.git</url>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+        <hudson.plugins.git.BranchSpec>
+          <name>*/master</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>demoscript.groovy</scriptPath>
   </definition>
   <triggers>
     <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger plugin="gerrit-trigger@2.15.1">
