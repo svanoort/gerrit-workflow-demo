@@ -22,7 +22,7 @@ RUN git config --global user.email "demouser@example.com" && \
 
 # Create repo working copies & then do bare clones to expose for work
 RUN cd /tmp/repos-wc && mkdir /tmp/repos && \
-    for r in primary secondary umbrella; do ( \
+    for r in primary secondary umbrella workflow; do ( \
         cd $r; git init && git add . && git commit -am "Initial commit"; \
         git clone --bare /tmp/repos-wc/$r /var/gerrit/git/$r.git; \
     ); done;
