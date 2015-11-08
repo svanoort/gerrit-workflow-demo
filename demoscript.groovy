@@ -9,7 +9,11 @@ def fetch_repo() {
     sh "repo download $GERRIT_PROJECT $GERRIT_CHANGE_NUMBER/$GERRIT_PATCHSET_NUMBER"
 }
 
+// Builds are defined before being run!
+// We are building up a set of parallel pipelines, one using workflow for build +
+//builds... they're defined first as a name : {block} pairs, then run by 'parallel' DSL step
 def builds = [:]
+// Core build/run inlined with workflow
 builds['workflowrun'] =  {
   node {
     sh 'rm -rf source'
@@ -23,7 +27,10 @@ builds['workflowrun'] =  {
     }
   }
 
+  // Set of tests that run slowly and are run in parallel for speed
   def slowtests = [:]
+
+  // Fast functional tests run in parallel with slower integration tests
   slowtests['Functional Tests'] = {
     node {
      // Fetch both artifacts
@@ -35,6 +42,8 @@ builds['workflowrun'] =  {
      sh 'java -jar secondary*.jar'
     }
   }
+
+  // Slower integration tests that are run
   slowtests['Integration tests'] = {
     node {
       sleep 15
@@ -43,13 +52,13 @@ builds['workflowrun'] =  {
     }
   }
   slowtests['failFast'] = true
-  parallel slowtests
+  parallel slowtests  // This is where it actually will run this step when block is executed
 }
 
-// PARALLEL BUILD STEP
+// PARALLEL NESTED PIPE
 builds['parallelbuild'] = {
   build job: 'freestylebuild', parameters: [[$class: 'StringParameterValue', name: 'sample', value: 'val']]
 }
 
 builds['failFast'] = true
-parallel builds
+parallel builds // This is where the block is finally run
