@@ -11,9 +11,6 @@ COPY ReviewDB.h2.db /var/gerrit/db/ReviewDB.h2.db
 COPY repos /tmp/repos-wc
 RUN chown -R gerrit:gerrit /tmp/repos-wc var/gerrit/db/ReviewDB.h2.db
 
-# Git access to repo
-EXPOSE 9418
-
 USER gerrit
 RUN git config --global user.email "demouser@example.com" && \
     git config --global user.name "Demo User"
