@@ -13,7 +13,7 @@ RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo \
     && chmod a+x /bin/repo
 
 # Maven install
-ENV MAVEN_VERSION 3.3.1
+ENV MAVEN_VERSION 3.3.9
 RUN cd /usr/local; wget -O - http://mirrors.ibiblio.org/apache/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar xvzf -
 RUN ln -sv /usr/local/apache-maven-$MAVEN_VERSION /usr/local/maven
 
