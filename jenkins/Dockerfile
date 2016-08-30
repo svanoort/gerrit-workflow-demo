@@ -1,4 +1,4 @@
-FROM jenkins:1.609.2
+FROM jenkins:1.651.3
 MAINTAINER svanoort
 
 # Workflow demo, jenkins host setup
